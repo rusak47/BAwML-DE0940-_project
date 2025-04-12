@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Search Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom transitions */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .checkmark {
+            transition: all 0.2s ease;
+        }
+        
+        .checkmark:hover {
+            transform: scale(1.1);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        
+        .search-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .result-image {
+            transition: transform 0.3s ease;
+        }
+        
+        .result-image:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Page 1 - Search Home -->
+    <div id="page1" class="min-h-screen">
+        <header class="bg-blue-700 text-white py-6 shadow-lg">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold">SearchPortal<span class="text-blue-300">Pro</span></h1>
+                    <button id="themeToggle" class="p-2 rounded-full bg-blue-600 hover:bg-blue-800 transition">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <main class="container mx-auto px-4 py-12">
+            <div class="search-container max-w-4xl mx-auto p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6 text-center">Find What You Need</h2>
+                
+                <div class="mb-8 fade-in">
+                    <div class="relative flex items-center">
+                        <input type="text" id="searchInput" placeholder="Enter your search terms..." 
+                               class="w-full px-6 py-4 rounded-lg border-2 border-blue-300 focus:border-blue-500 focus:outline-none transition text-lg shadow-sm">
+                        <button id="searchBtn" class="absolute right-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition flex items-center">
+                            <i class="fas fa-search mr-2"></i> Search
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="fade-in">
+                    <h3 class="text-xl font-medium text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-sliders-h mr-2"></i> Search Filters
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Category Filters -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                            <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-tags mr-2 text-blue-500"></i> Categories
+                            </h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" class="hidden category-filter" value="technology">
+                                    <div class="w-5 h-5 border border-gray-300 rounded flex items-center justify-center checkmark">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="ml-2">Technology</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" class="hidden category-filter" value="science" checked>
+                                    <div class="w-5 h-5 border border-gray-300 rounded flex items-center justify-center checkmark bg-blue-500 border-blue-500">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="ml-2">Science</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" class="hidden category-filter" value="business">
+                                    <div class="w-5 h-5 border border-gray-300 rounded flex items-center justify-center checkmark">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="ml-2">Business</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" class="hidden category-filter" value="health">
+                                    <div class="w-5 h-5 border border-gray-300 rounded flex items-center justify-center checkmark">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="ml-2">Health</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Time Filters -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                            <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-clock mr-2 text-blue-500"></i> Time Range
+                            </h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="timeFilter" class="hidden" value="any" checked>
+                                    <div class="w-5 h-5 border border-gray-300 rounded-full flex items-center justify-center checkmark">
+                                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <span class="ml-2">Any Time</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="timeFilter" class="hidden" value="day">
+                                    <div class="w-5 h-5 border border-gray-300 rounded-full flex items-center justify-center checkmark">
+                                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <span class="ml-2">Last 24 Hours</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="timeFilter" class="hidden" value="week">
+                                    <div class="w-5 h-5 border border-gray-300 rounded-full flex items-center justify-center checkmark">
+                                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <span class="ml-2">Last Week</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="timeFilter" class="hidden" value="month">
+                                    <div class="w-5 h-5 border border-gray-300 rounded-full flex items-center justify-center checkmark">
+                                        <div class="w-2 h-2 rounded-full bg-white"></div>
+                                    </div>
+                                    <span class="ml-2">Last Month</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Other Filters -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                            <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-cog mr-2 text-blue-500"></i> Other Options
+                            </h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" class="hidden" id="exactMatch">
+                                    <div class="w-5 h-5 border border-gray-300 rounded flex items-center justify-center checkmark">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="ml-2">Exact Match</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" class="hidden" id="verifiedOnly" checked>
+                                    <div class="w-5 h-5 border border-gray-300 rounded flex items-center justify-center checkmark bg-blue-500 border-blue-500">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="ml-2">Verified Only</span>
+                                </label>
+                                <div class="pt-2">
+                                    <label for="resultType" class="block text-sm font-medium text-gray-700">Result Type</label>
+                                    <select id="resultType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                        <option>All Types</option>
+                                        <option>Articles</option>
+                                        <option>Videos</option>
+                                        <option>Images</option>
+                                        <option>Datasets</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 flex justify-center">
+                        <button id="advancedSearchBtn" class="text-blue-600 hover:text-blue-800 flex items-center transition">
+                            <i class="fas fa-chevron-down mr-1"></i> Advanced Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center text-gray-500">
+                <p>Try searching for: "quantum computing", "sustainable energy", or "machine learning"</p>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Page 2 - Search Results -->
+    <div id="page2" class="min-h-screen hidden">
+        <header class="bg-blue-700 text-white py-6 shadow-lg">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold">SearchPortal<span class="text-blue-300">Pro</span></h1>
+                    <div>
+                        <button id="backToSearchBtn" class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg transition mr-3">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button id="themeToggle2" class="p-2 rounded-full bg-blue-600 hover:bg-blue-800 transition">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="container mx-auto px-4 py-8">
+            <div class="max-w-4xl mx-auto mb-8">
+                <div class="relative flex items-center">
+                    <input type="text" id="searchInputResults" placeholder="Enter your search terms..." 
+                           class="w-full px-6 py-4 rounded-lg border-2 border-blue-300 focus:border-blue-500 focus:outline-none transition text-lg shadow-sm">
+                    <button id="searchBtnResults" class="absolute right-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition flex items-center">
+                        <i class="fas fa-search mr-2"></i> Search
+                    </button>
+                </div>
+                
+                <div class="mt-4 px-2 flex flex-wrap gap-3">
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
+                        Science <button class="ml-1 text-blue-500 hover:text-blue-700"><i class="fas fa-times"></i></button>
+                    </span>
+                    <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm flex items-center">
+                        Last Week <button class="ml-1 text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+                    </span>
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
+                        Verified Only <button class="ml-1 text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800">Search Results for "<span id="searchQueryText">quantum computing</span>"</h2>
+                    <div class="text-gray-500">
+                        About <span id="resultCount">127</span> results (<span id="searchTime">0.42</span> seconds)
+                    </div>
+                </div>
+                
+                <div id="searchResults" class="space-y-6">
+                    <!-- Result 1 -->
+                    <div class="result-card bg-white rounded-xl shadow-md overflow-hidden transition cursor-pointer" onclick="showResultDetails(1)">
+                        <div class="md:flex">
+                            <div class="md:flex-shrink-0 md:w-48">
+                                <img class="h-full w-full object-cover result-image" src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Quantum computing concept">
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-1">
+                                    <span class="text-blue-600 text-sm font-medium">Nature Journal</span>
+                                    <span class="mx-2 text-gray-400">•</span>
+                                    <span class="text-gray-500 text-sm">June 15, 2023</span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">Breakthrough in Quantum Error Correction</h3>
+                                <p class="text-gray-600 mb-3">Researchers have developed a new method for quantum error correction that could make quantum computers significantly more reliable. The technique involves...</p>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">quantum</span>
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">computing</span>
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">physics</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Result 2 -->
+                    <div class="result-card bg-white rounded-xl shadow-md overflow-hidden transition cursor-pointer" onclick="showResultDetails(2)">
+                        <div class="md:flex">
+                            <div class="md:flex-shrink-0 md:w-48">
+                                <img class="h-full w-full object-cover result-image" src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Quantum chip">
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-1">
+                                    <span class="text-blue-600 text-sm font-medium">MIT Technology Review</span>
+                                    <span class="mx-2 text-gray-400">•</span>
+                                    <span class="text-gray-500 text-sm">June 10, 2023</span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">IBM Unveils 1000-Qubit Quantum Processor</h3>
+                                <p class="text-gray-600 mb-3">IBM has announced a major milestone in quantum computing with its new 1000-qubit processor. While still not fault-tolerant, this breakthrough represents...</p>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">ibm</span>
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">hardware</span>
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">qubits</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Result 3 -->
+                    <div class="result-card bg-white rounded-xl shadow-md overflow-hidden transition cursor-pointer" onclick="showResultDetails(3)">
+                        <div class="md:flex">
+                            <div class="md:flex-shrink-0 md:w-48">
+                                <img class="h-full w-full object-cover result-image" src="https://images.unsplash.com/photo-1579829366248-204fe8413f31?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Chemistry research">
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-1">
+                                    <span class="text-blue-600 text-sm font-medium">Science Magazine</span>
+                                    <span class="mx-2 text-gray-400">•</span>
+                                    <span class="text-gray-500 text-sm">June 5, 2023</span>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">Quantum Computing for Drug Discovery Shows Promise</h3>
+                                <p class="text-gray-600 mb-3">A team of researchers has demonstrated how quantum computing could revolutionize drug discovery by simulating molecular interactions with unprecedented...</p>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">medicine</span>
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">biology</span>
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">pharmaceuticals</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-center">
+                    <nav class="flex items-center space-x-2">
+                        <button class="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-4 py-2 border border-blue-500 rounded-md bg-blue-50 text-blue-600 font-medium">1</button>
+                        <button class="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50">2</button>
+                        <button class="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50">3</button>
+                        <span class="px-2 text-gray-500">...</span>
+                        <button class="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50">8</button>
+                        <button class="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Page 3 - Result Details -->
+    <div id="page3" class="min-h-screen hidden">
+        <header class="bg-blue-700 text-white py-6 shadow-lg">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold">SearchPortal<span class="text-blue-300">Pro</span></h1>
+                    <div>
+                        <button id="backToResultsBtn" class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg transition mr-3">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Results
+                        </button>
+                        <button id="themeToggle3" class="p-2 rounded-full bg-blue-600 hover:bg-blue-800 transition">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="container mx-auto px-4 py-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="text-blue-600 text-sm font-medium">Nature Journal</span>
+                            <span class="mx-2 text-gray-400">•</span>
+                            <span class="text-gray-500 text-sm">June 15, 2023</span>
+                        </div>
+                        
+                        <h2 class="text-3xl font-bold text-gray-900 mb-4">Breakthrough in Quantum Error Correction Opens Path to Reliable Quantum Computers</h2>
+                        
+                        <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1000&amp;q=80" alt="Quantum computing research" class="w-full h-96 object-cover rounded-lg mb-6 shadow-md">
+                        
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">quantum</span>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">computing</span>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">physics</span>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">technology</span>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">research</span>
+                        </div>
+                        
+                        <div class="prose max-w-none">
+                            <p class="text-gray-700 mb-4 leading-relaxed">In a landmark achievement for quantum computing, researchers at the Quantum Information Institute have developed a novel error correction technique that significantly improves the reliability of quantum computations. Published today in <em>Nature</em>, the findings may overcome one of the biggest obstacles to practical quantum computing.</p>
+                            
+                            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">The Challenge of Quantum Errors</h3>
+                            <p class="text-gray-700 mb-4 leading-relaxed">Quantum computers are incredibly sensitive to their environment. Minute fluctuations in temperature or electromagnetic fields can cause qubits—the quantum equivalent of classical bits—to lose their quantum state in a process called decoherence. This leads to errors that accumulate during computation, making long calculations unreliable.</p>
+                            
+                            <p class="text-gray-700 mb-4 leading-relaxed">"Error correction is the biggest challenge facing quantum computing today," explains Dr. Elena Martinez, lead author of the study. "Without effective error correction, quantum computers can't perform the long calculations needed for practical applications."</p>
+                            
+                            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">The New Approach</h3>
+                            <p class="text-gray-700 mb-4 leading-relaxed">Current error correction methods require an impractical number of physical qubits to encode each logical qubit robustly. The new approach, called "Topological Surface Code Concatenation," combines two error correction methods in a way that requires fewer physical qubits while still providing strong protection against errors.</p>
+                            
+                            <p class="text-gray-700 mb-4 leading-relaxed">The researchers demonstrated their technique on a 72-qubit superconducting quantum processor, achieving error rates low enough to implement complex quantum algorithms that were previously impossible. Their results show a threefold improvement in error suppression compared to existing methods at similar qubit counts.</p>
+                            
+                            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Implications for the Future</h3>
+                            <p class="text-gray-700 mb-4 leading-relaxed">This breakthrough could accelerate the timeline for practical quantum computing applications. Potential near-term impacts include:</p>
+                            
+                            <ul class="list-disc pl-6 text-gray-700 mb-4 space-y-2">
+                                <li>More accurate quantum simulations for drug discovery and materials science</li>
+                                <li>Improved optimization algorithms for logistics and financial modeling</li>
+                                <li>More reliable quantum machine learning applications</li>
+                                <li>Progress toward fault-tolerant quantum computers</li>
+                            </ul>
+                            
+                            <p class="text-gray-700 mb-4 leading-relaxed">"We're not yet at the stage where we can run arbitrarily long computations," cautions Dr. Martinez, "but we've shown that with continued improvements to error correction, that milestone is within reach."</p>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h4 class="text-lg font-medium text-gray-800 mb-4">Related Research</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 h-16 w-16 bg-blue-50 rounded flex items-center justify-center text-blue-500 mr-3">
+                                            <i class="fas fa-file-alt text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-sm font-medium text-gray-900">Quantum Volume as a Metric</h5>
+                                            <p class="text-xs text-gray-500 mt-1">IBM Research - June 2023</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 h-16 w-16 bg-blue-50 rounded flex items-center justify-center text-blue-500 mr-3">
+                                            <i class="fas fa-file-alt text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-sm font-medium text-gray-900">Benchmarking Quantum Processors</h5>
+                                            <p class="text-xs text-gray-500 mt-1">Google Quantum AI - May 2023</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                        <div class="flex items-center">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Author" class="h-10 w-10 rounded-full mr-3">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Dr. Elena Martinez</p>
+                                <p class="text-xs text-gray-500">Quantum Information Institute</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                            <button class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 md:p-8">
+                        <h4 class="text-lg font-medium text-gray-800 mb-4">Comments (3)</h4>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="h-10 w-10 rounded-full mr-3 mt-1">
+                                <div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="flex items-center mb-1">
+                                            <p class="text-sm font-medium text-gray-900">Prof. Alan Chen</p>
+                                            <span class="mx-2 text-gray-400">•</span>
+                                            <span class="text-xs text-gray-500">June 16, 2023</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700">This is truly a remarkable advance in the field. The concatenated code approach elegantly solves several problems we've been grappling with. I'm particularly impressed by the error suppression rates achieved.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <img src="https://randomuser.me/api/portraits/women/23.jpg" alt="User" class="h-10 w-10 rounded-full mr-3 mt-1">
+                                <div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="flex items-center mb-1">
+                                            <p class="text-sm font-medium text-gray-900">Dr. Sarah Kim</p>
+                                            <span class="mx-2 text-gray-400">•</span>
+                                            <span class="text-xs text-gray-500">June 17, 2023</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700">Could the authors comment on how this method scales with increasing qubit counts? The results are promising but I wonder about the overhead.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4">
+                                <textarea class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="Add your comment..."></textarea>
+                                <div class="mt-2 flex justify-end">
+                                    <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+                                        Post Comment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const themeBtns = document.querySelectorAll('#themeToggle, #themeToggle2, #themeToggle3 i');
+            themeBtns.forEach(btn => {
+                if (btn.classList.contains('fa-moon')) {
+                    btn.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    btn.classList.replace('fa-sun', 'fa-moon');
+                }
+            });
+        }
+        
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.getElementById('themeToggle2').addEventListener('click', toggleTheme);
+        document.getElementById('themeToggle3').addEventListener('click', toggleTheme);
+        
+        // Checkbox functionality
+        document.querySelectorAll('.category-filter').forEach(input => {
+            const label = input.parentElement;
+            const checkmark = label.querySelector('.checkmark');
+            
+            label.addEventListener('click', () => {
+                input.checked = !input.checked;
+                if (input.checked) {
+                    checkmark.classList.add('bg-blue-500', 'border-blue-500');
+                } else {
+                    checkmark.classList.remove('bg-blue-500', 'border-blue-500');
+                }
+            });
+        });
+        
+        // Radio button functionality
+        document.querySelectorAll('input[name="timeFilter"]').forEach(input => {
+            const label = input.parentElement;
+            const checkmark = label.querySelector('.checkmark > div');
+            
+            label.addEventListener('click', () => {
+                document.querySelectorAll('input[name="timeFilter"]').forEach(radio => {
+                    radio.parentElement.querySelector('.checkmark > div').classList.remove('bg-blue-500');
+                });
+                input.checked = true;
+                checkmark.classList.add('bg-blue-500');
+            });
+        });
+        
+        // Page navigation
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const searchQuery = document.getElementById('searchInput').value;
+            if (searchQuery.trim()) {
+                document.getElementById('page1').classList.add('hidden');
+                document.getElementById('page2').classList.remove('hidden');
+                document.getElementById('searchQueryText').textContent = searchQuery;
+                document.getElementById('searchInputResults').value = searchQuery;
+            }
+        });
+        
+        document.getElementById('searchBtnResults').addEventListener('click', () => {
+            const searchQuery = document.getElementById('searchInputResults').value;
+            if (searchQuery.trim()) {
+                document.getElementById('searchQueryText').textContent = searchQuery;
+            }
+        });
+        
+        document.getElementById('backToSearchBtn').addEventListener('click', () => {
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById('page1').classList.remove('hidden');
+        });
+        
+        function showResultDetails(resultId) {
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById('page3').classList.remove('hidden');
+        }
+        
+        document.getElementById('backToResultsBtn').addEventListener('click', () => {
+            document.getElementById('page3').classList.add('hidden');
+            document.getElementById('page2').classList.remove('hidden');
+        });
+        
+        // Allow Enter key to trigger search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('searchBtn').click();
+            }
+        });
+        
+        document.getElementById('searchInputResults').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('searchBtnResults').click();
+            }
+        });
+        
+        // Advanced search toggle
+        document.getElementById('advancedSearchBtn').addEventListener('click', () => {
+            alert('Advanced search features would be implemented here');
+        });
+        
+        // Simulate loading time for results
+        setTimeout(() => {
+            const randomTime = (Math.random() * 0.3 + 0.2).toFixed(2);
+            document.getElementById('searchTime').textContent = randomTime;
+        }, 500);
+    </script>
+</body>
+</html>

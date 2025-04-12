@@ -1,0 +1,11 @@
+database:
+  user: postgres_user
+  password: db_pass
+  host: hostip
+  port: postgres_port
+  name: db_name
+
+logging:
+  debug: true
+  log_file: app.log 
+  console_output: true

@@ -1,0 +1,8 @@
+app/config.yaml
+venv
+bk
+deadlines.md
+.gitsecret
+.do/
+app.log
+__pycache__/
