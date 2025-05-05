@@ -22,7 +22,6 @@ if 'is_loading' not in st.session_state:
 
 RESULTS_PER_PAGE = 6
 
-
 def show_search_page():
     # Add widgets to sidebar
     st.sidebar.title('Search')

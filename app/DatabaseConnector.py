@@ -60,7 +60,7 @@ class DatabaseConnector:
             list: List of tuples containing the matching records
 
         CREATE TABLE ads (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY, //todo fix to serial for auto increment
             site_id VARCHAR NOT NULL,
             district VARCHAR NOT NULL,
             street VARCHAR NOT NULL,
@@ -75,6 +75,7 @@ class DatabaseConnector:
             price_m2 DECIMAL(15, 5) NOT NULL,
             site VARCHAR NOT NULL,
             description VARCHAR
+            //todo add timestamp (when ad was fetched)
         );
     """
     def search_ads(self, filters=None):
@@ -83,7 +84,7 @@ class DatabaseConnector:
                 if not self.connect():
                     return []
 
-            query = "SELECT * FROM ads"
+            query = "SELECT id, site_id, district, street, nr_of_rooms, area_m2, floor, floor_max, series, building_type, extra, price, price_m2, site, description FROM ads"
             params = []
             conditions = []
 

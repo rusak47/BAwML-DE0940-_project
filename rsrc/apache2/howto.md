@@ -1,0 +1,1 @@
+https://www.digitalocean.com/community/questions/redirect-ip-to-domain-name
