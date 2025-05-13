@@ -1,0 +1,1 @@
+\copy ads(site_id, district, street, nr_of_rooms,area_m2,floor,floor_max,series,building_type,extra,price,price_m2,site,description) FROM '/var/lib/postgresql/output.csv' DELIMITER ',' CSV HEADER
