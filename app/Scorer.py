@@ -3,6 +3,7 @@ import requests
 from dotenv import load_dotenv
 
 from BaseDatabaseConnector import BaseDatabaseConnector
+from Ad import Ad
 
 class Scorer(BaseDatabaseConnector):
     """
@@ -61,6 +62,44 @@ class Scorer(BaseDatabaseConnector):
             self.error(f"Error while getting location score: {e}")
             return -1
 
+    def get_score_for_ad(self, ad: Ad, threshold: float = 0.0) -> float:
+        """
+        Get a score for an ad based on its coordinates.
+
+        Args:
+            ad (Ad): Ad object
+            threshold (float): Threshold value below which we should stop scoring (default: 0.0)
+                              This parameter is not used in this method but is included for API consistency
+
+        Returns:
+            float: Score value or -1 if an error occurred
+        """
+        try:
+            lat, lon = self.get_lat_lon(ad.street)
+            score = self.get_score(lat, lon)
+            return score
+        except Exception as e:
+            self.error(f"Error while getting score for ad: {e}")
+            return -1
+
+    def should_continue_scoring(self, score: float, threshold: float = 0.0) -> bool:
+        """
+        Determine if we should continue scoring more ads based on the current score.
+
+        Args:
+            score (float): The current ad's score
+            threshold (float): Threshold value below which we should stop scoring
+
+        Returns:
+            bool: True if we should continue scoring, False otherwise
+        """
+        # If score is -1, it means there was an error, so we should continue
+        if score == -1:
+            return True
+
+        # If score is below threshold, we should stop scoring
+        return score >= threshold
+
 
 if __name__ == "__main__":
     scorer = Scorer()
@@ -68,3 +107,31 @@ if __name__ == "__main__":
     print(scorer.get_lat_lon("Bruņinieku iela 45"))
     print("score:")
     print(scorer.get_score(56.9519, 24.1171))
+
+    print("score for ad:")
+    ad = Ad(
+        id=1,
+        site_id=1,
+        district="Centrs",
+        street="Bruņinieku iela 45",
+        nr_of_rooms=2,
+        area_m2=50,
+        floor=2,
+        floor_max=2,
+        price=50000,
+        site="http://example.com",
+        description="description",
+        building_type="building_type",
+        series="series"
+    )
+    score = scorer.get_score_for_ad(ad)
+    print(f"Score: {score}")
+
+    # Test threshold functionality
+    threshold = 0.7
+    should_continue = scorer.should_continue_scoring(score, threshold)
+    print(f"Should continue scoring (threshold={threshold})? {should_continue}")
+
+    threshold = 0.3
+    should_continue = scorer.should_continue_scoring(score, threshold)
+    print(f"Should continue scoring (threshold={threshold})? {should_continue}")

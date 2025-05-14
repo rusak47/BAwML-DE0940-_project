@@ -3,7 +3,7 @@ import streamlit as st
 import psycopg2
 from psycopg2 import Error
 from streamlit.components.v1 import html
-from DatabaseConnector import DatabaseConnector
+from Searcher import Searcher
 from Range import Range
 
 # Add custom CSS
@@ -26,15 +26,15 @@ def show_search_page():
     # Add widgets to sidebar
     st.sidebar.title('Search')
     st.sidebar.header('Filters')
-    
+
     # Create separate rows for search form and results
     # Search form row
     from SearchForm import create_search_form
-    create_search_form(st, DatabaseConnector()) 
-    
+    create_search_form(st, Searcher())
+
     # Results row
     from SearchResultsContainer import create_search_results_container
-    create_search_results_container(st, RESULTS_PER_PAGE, DatabaseConnector())
+    create_search_results_container(st, RESULTS_PER_PAGE, Searcher())
 
 from DetailsPage import show_details_page2
 
