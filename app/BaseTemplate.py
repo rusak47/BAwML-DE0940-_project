@@ -17,22 +17,22 @@ def base_page_style_extended():
             }}
 
             .div_img_preview {{
-                position: relative; 
-                display: block; 
-                width: 911px; 
-                max-width: 100%; 
-                overflow: hidden; 
-                border: 1px solid rgb(204, 204, 204); 
-                cursor: pointer; margin: -1px; 
+                position: relative;
+                display: block;
+                width: 911px;
+                max-width: 100%;
+                overflow: hidden;
+                border: 1px solid rgb(204, 204, 204);
+                cursor: pointer; margin: -1px;
                 height: 512px;
             }}
 
             .div_img_scroll {{
-                position: relative; 
-                display: block; 
-                z-index: 2; 
-                height: 512px; 
-                overflow: hidden scroll; 
+                position: relative;
+                display: block;
+                z-index: 2;
+                height: 512px;
+                overflow: hidden scroll;
                 width: 512px;
             }}
 
@@ -46,7 +46,7 @@ def base_page_style_extended():
                 margin-left: 0 !important;
                 width: 100% !important;
             }}
-            
+
             .search-result {{
                 background-color: white !important;
                 padding: 15px !important;
@@ -76,7 +76,7 @@ def base_page_style_extended():
             .search-result-right {{
                 flex: 1 !important;
                 min-width: 0 !important;
-            }}            
+            }}
 
             /* Center spinner */
             .stSpinner {{
@@ -139,7 +139,7 @@ def base_page_style():
     """
 
 def get_base_page_template(title, content):
-    return f"""    
+    return f"""
         <div class="container">
             <div class="header">
                 <h1>{title}</h1>
@@ -147,6 +147,15 @@ def get_base_page_template(title, content):
     """
 
 def get_page_result_template(ad):
+    # Safely format the score if available
+    score_display = "<p></p>"
+    try:
+        if hasattr(ad, 'score') and ad.score is not None:
+            score_display = f'<span style="color: green; font-weight: bold;">Score: {ad.score:.2f}</span>'
+    except Exception:
+        # If there's any error with the score, just don't display it
+        pass
+
     return f"""
         <div class="search-result">
             <div class="search-result-columns">
@@ -157,6 +166,7 @@ def get_page_result_template(ad):
                 <div class="search-result-left">
                     <p><strong>{ad.district}, {ad.street}</strong></p>
                     <p>{ad.area_m2} m² • {ad.nr_of_rooms} • {ad.floor}/{ad.floor_max}</p>
+                    {score_display}
                 </div>
                 <!-- Middle column (Price) -->
                 <div class="search-result-middle">

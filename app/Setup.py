@@ -7,6 +7,8 @@ def setup_logging(debug_mode=False, log_file=None, console_output=True):
     # Get root logger
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG if debug_mode else logging.INFO)
+    
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
     # Remove all existing handlers to prevent duplicates
     for handler in logger.handlers[:]:

@@ -1,30 +1,71 @@
 class Ad:
-    def __init__(self, id, site_id, district, street, nr_of_rooms, area_m2, floor, 
-                 floor_max, series, building_type, extra, price, price_m2, site, description):
-        self.id = id
-        self.site_id = site_id
-        self.district = district
-        self.street = street
-        self.nr_of_rooms = nr_of_rooms
-        self.area_m2 = area_m2
-        self.floor = floor
-        self.floor_max = floor_max
-        self.series = series
-        self.building_type = building_type
-        self.extra = extra
-        self.price = price
-        self.price_m2 = price_m2
-        self.site = site
-        self.description = description
+    def __init__(self, **kwargs):
+        """
+        Initialize an Ad object with the given attributes.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments that will be set as attributes.
+                     Common attributes include:
+                     - id: Unique identifier
+                     - site_id: Site identifier
+                     - district: District name
+                     - street: Street address
+                     - nr_of_rooms: Number of rooms
+                     - area_m2: Area in square meters
+                     - floor: Floor number
+                     - floor_max: Maximum floor in the building
+                     - series: Building series
+                     - building_type: Type of building
+                     - extra: Additional information
+                     - price: Price in currency units
+                     - price_m2: Price per square meter
+                     - site: Website source
+                     - description: Full description
+                     - lat: Latitude
+                     - lon: Longitude
+                     - score: Location score
+        """
+        # Set default values for common attributes
+        self.id = None
+        self.site_id = None
+        self.district = None
+        self.street = None
+        self.nr_of_rooms = None
+        self.area_m2 = None
+        self.floor = None
+        self.floor_max = None
+        self.series = None
+        self.building_type = None
+        self.extra = None
+        self.price = None
+        self.price_m2 = None
+        self.site = None
+        self.description = None
+        self.lat = None
+        self.lon = None
+        self.score = None
+
+        # Update with provided values
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __str__(self):
-        return f"Ad(id={self.id}, district={self.district}, street={self.street}, " \
-               f"price={self.price}, area={self.area_m2}m², rooms={self.nr_of_rooms})"
+        return f"Ad(id={self.id}, score={self.score}, district={self.district}, street={self.street}, " \
+               f"price={self.price}, area={self.area_m2}m², rooms={self.nr_of_rooms}, lat={self.lat}, lon={self.lon})"
 
     @classmethod
     def from_db_row(cls, row):
-        """Create an Ad object from a database row tuple"""
-        return cls(
+        """
+        Create an Ad object from a database row tuple
+
+        Args:
+            row: Database row tuple
+
+        Returns:
+            Ad: New Ad instance
+        """
+        # Create a new Ad instance with attributes from the database row
+        ad = cls(
             id=row[0],
             site_id=row[1],
             district=row[2],
@@ -39,5 +80,8 @@ class Ad:
             price=row[11],
             price_m2=row[12],
             site=row[13],
-            description=row[14]
-        ) 
+            description=row[14],
+            score=row[15]
+        )
+
+        return ad
