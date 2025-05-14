@@ -1,6 +1,4 @@
-import os
 import requests
-from dotenv import load_dotenv
 
 from BaseDatabaseConnector import BaseDatabaseConnector
 from Ad import Ad
