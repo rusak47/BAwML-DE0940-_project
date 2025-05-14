@@ -56,7 +56,8 @@ class Searcher(BaseDatabaseConnector):
             if not self.connection and not self.connect():
                 return []
 
-            query = "SELECT id, site_id, district, street, nr_of_rooms, area_m2, floor, floor_max, series, building_type, extra, price, price_m2, site, description FROM ads"
+            query = """SELECT ads.id, ads.site_id, ads.district, ads.street, ads.nr_of_rooms, ads.area_m2, ads.floor, ads.floor_max, ads.series, ads.building_type, ads.extra, ads.price, ads.price_m2, ads.site, ads.description, ad_scores.score
+                        FROM ads LEFT JOIN ad_scores ON ads.id = ad_scores.ad_id"""
             params = []
             conditions = []
 
@@ -87,6 +88,7 @@ class Searcher(BaseDatabaseConnector):
                 if conditions:
                     query += " WHERE " + " AND ".join(conditions)
 
+            query += " ORDER BY ad_scores.score DESC NULLS LAST" # keep null values last
             self.debug(f"query: {query}")
             self.debug(f"params: {params}")
 
@@ -184,18 +186,22 @@ class Searcher(BaseDatabaseConnector):
 
             # Calculate scores for the limited set
             for i in range(items_to_score):
-                try:
-                    # Get score for the current ad
-                    score = self.scorer.get_score_for_ad(ads[i], score_threshold)
-                    ads[i].score = score
+                if(ads[i].score is None):
+                    self.debug(f"Calculating missing score for {ads[i]}")
 
-                    # Check if we should continue scoring based on the current score
-                    if not self.scorer.should_continue_scoring(score, score_threshold):
-                        self.debug(f"Stopping score calculation at item {i+1} because score {score} is below threshold {score_threshold}")
-                        break
-                except Exception as e:
-                    self.warning(f"Could not calculate score for ad {ads[i].id}: {e}")
-                    ads[i].score = None
+                    try:
+                        # Get score for the current ad
+                        score = self.scorer.get_score_for_ad(ads[i], score_threshold)
+                        self.save_score(ads[i])
+
+                        # Check if we should continue scoring based on the current score
+                        if not self.scorer.should_continue_scoring(score, score_threshold):
+                            self.debug(f"Stopping score calculation at item {i+1} because score {score} is below threshold {score_threshold}")
+                            break
+                    except Exception as e:
+                        self.warning(f"Could not calculate score for ad {ads[i].id}: {e}")
+                        continue
+                    
 
             # Sort by score in descending order (highest score first)
             try:
@@ -214,6 +220,31 @@ class Searcher(BaseDatabaseConnector):
         except Exception as error:
             self.error(f"Error while calculating scores for ads: {error}")
             return ads
+        
+    def save_score(self, ad):
+        """
+        Save the score for an ad in the ad_scores table.
+
+        Args:
+            ad (Ad): Ad object with score to save
+        """
+        try:
+            if not self.connection and not self.connect():
+                return
+
+            insert_query = """
+                INSERT INTO ad_scores (ad_id, lon, lat, score)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (ad_id) DO UPDATE 
+                SET lon = %s, lat = %s, score = %s
+            """
+            self.cursor.execute(
+                insert_query, 
+                [ad.id, ad.lon, ad.lat, ad.score, ad.lon, ad.lat, ad.score]
+            )
+            self.connection.commit()
+        except Exception as e:
+            self.error(f"Error saving score for ad {ad.id}: {e}")
 
 if __name__ == "__main__":
     # Test database connection

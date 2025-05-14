@@ -30,6 +30,10 @@ bad (probably LLMs)
 - DB: Postgres + PostGIS
 - Frontend + Backend: Streamlit
 
+**Limitations**
+ - nominatim location finder should be feeded with preprocessed adresses, otherwise it may fail to find the location with abbreviations or to descriptive names 
+ - scorer function is time consuming - hardly can be used for a long lists
+   - workaround: cache scores in db (ad_scores)
 
 ## DigitalOcean-Docker-Streamlit App.
 

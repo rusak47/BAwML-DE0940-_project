@@ -35,7 +35,7 @@ class Scorer(BaseDatabaseConnector):
         try:
             r = requests.get(url).json()[0]
         except IndexError:
-            print(f"An invalid or non-existing street name: {street}->{street_url}")
+            self.warning(f"An invalid or non-existing street name: {street}->{street_url}")
             return (0, 0)
 
         latitude = r["lat"]
@@ -94,9 +94,15 @@ class Scorer(BaseDatabaseConnector):
         try:
             # Get coordinates for the address
             lat, lon = self.get_lat_lon(ad.street)
+            
+            # Update ad with coordinates
+            ad.lat = lat
+            ad.lon = lon
 
             # Calculate score based on coordinates
             score = self.get_score(lat, lon)
+            ad.score = score
+            
             return score
         except Exception as e:
             self.error(f"Error while getting score for ad: {e}")
@@ -153,6 +159,7 @@ if __name__ == "__main__":
     )
     score = scorer.get_score_for_ad(ad)
     print(f"Score: {score}")
+    print(f"Ad: {ad}")
 
     # Test threshold functionality
     threshold = 0.7

@@ -21,6 +21,8 @@ class Ad:
                      - price_m2: Price per square meter
                      - site: Website source
                      - description: Full description
+                     - lat: Latitude
+                     - lon: Longitude
                      - score: Location score
         """
         # Set default values for common attributes
@@ -39,6 +41,8 @@ class Ad:
         self.price_m2 = None
         self.site = None
         self.description = None
+        self.lat = None
+        self.lon = None
         self.score = None
 
         # Update with provided values
@@ -46,17 +50,16 @@ class Ad:
             setattr(self, key, value)
 
     def __str__(self):
-        return f"Ad(id={self.id}, district={self.district}, street={self.street}, " \
-               f"price={self.price}, area={self.area_m2}m², rooms={self.nr_of_rooms})"
+        return f"Ad(id={self.id}, score={self.score}, district={self.district}, street={self.street}, " \
+               f"price={self.price}, area={self.area_m2}m², rooms={self.nr_of_rooms}, lat={self.lat}, lon={self.lon})"
 
     @classmethod
-    def from_db_row(cls, row, scorer=None):
+    def from_db_row(cls, row):
         """
         Create an Ad object from a database row tuple
 
         Args:
             row: Database row tuple
-            scorer: Optional Scorer instance to calculate location score
 
         Returns:
             Ad: New Ad instance
@@ -77,7 +80,8 @@ class Ad:
             price=row[11],
             price_m2=row[12],
             site=row[13],
-            description=row[14]
+            description=row[14],
+            score=row[15]
         )
 
         return ad

@@ -91,5 +91,6 @@ def search(st, db, search_text=None, district=None, building_type=None, series=N
                     # as they will use the values from config.yaml
                 )
 
-            st.session_state.is_loading = False
-            st.rerun()
+        # kep outside of db context to avoid unintended transaction rollback
+        st.session_state.is_loading = False
+        st.rerun()
