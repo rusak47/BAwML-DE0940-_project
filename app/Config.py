@@ -44,10 +44,15 @@ class Config:
     def get_database_config(self) -> Dict[str, str]:
         """Get database configuration"""
         return self._config.get('database', {})
+    
+    def get_osgi_scorer_database_config(self) -> Dict[str, str]:
+        """Get database configuration"""
+        return self._config.get('osgi_scorer', {})
 
     def get_logging_config(self) -> Dict[str, Any]:
         """Get logging configuration"""
         return self._config.get('logging', {}) 
+    
     
 
 if __name__ == "__main__":
