@@ -19,7 +19,7 @@ class Config:
         """Load configuration from file or environment variables"""
         current_dir = os.path.dirname(os.path.abspath(__file__))
         config_file = os.getenv('CONFIG_FILE', os.path.join(current_dir, 'config.yaml'))
-        
+
         # Try to load from file first
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
@@ -44,26 +44,31 @@ class Config:
     def get_database_config(self) -> Dict[str, str]:
         """Get database configuration"""
         return self._config.get('database', {})
-    
+
     def get_osgi_scorer_database_config(self) -> Dict[str, str]:
-        """Get database configuration"""
+        """Get location database configuration"""
         return self._config.get('osgi_scorer', {})
 
     def get_logging_config(self) -> Dict[str, Any]:
         """Get logging configuration"""
-        return self._config.get('logging', {}) 
-    
-    
+        return self._config.get('logging', {})
+
+
+    def get_limits_config(self) -> Dict[str, Any]:
+        """Get app limits configuration"""
+        return self._config.get('limits', {})
+
+
 
 if __name__ == "__main__":
     print("Testing Config class...")
-    
+
     # Test singleton pattern
     config1 = Config()
     config2 = Config()
     print("\nTesting singleton pattern:")
     print(f"✓ Same instance: {config1 is config2}")
-    
+
     # Test database config
     print("\nTesting database configuration:")
     db_config = config1.get_database_config()
@@ -74,7 +79,7 @@ if __name__ == "__main__":
         print("✓ All required database fields present")
     else:
         print(f"✗ Missing database fields: {missing_fields}")
-        
+
     # Test logging config
     print("\nTesting logging configuration:")
     log_config = config1.get_logging_config()
@@ -85,7 +90,18 @@ if __name__ == "__main__":
         print("✓ All required logging fields present")
     else:
         print(f"✗ Missing logging fields: {missing_fields}")
-        
+
+    # Test limits config
+    print("\nTesting limits configuration:")
+    limits_config = config1.get_limits_config()
+    print("Limits config:", limits_config)
+    required_limits_fields = ['max_scored_items', 'score_threshold', 'scoring_enabled']
+    missing_fields = [field for field in required_limits_fields if field not in limits_config]
+    if not missing_fields:
+        print("✓ All required limits fields present")
+    else:
+        print(f"✗ Missing limits fields: {missing_fields}")
+
     # Test config file loading
     print("\nTesting config file loading:")
     if os.path.exists('config.yaml'):

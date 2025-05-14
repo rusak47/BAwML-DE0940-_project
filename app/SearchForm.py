@@ -84,10 +84,11 @@ def search(st, db, search_text=None, district=None, building_type=None, series=N
             # Now calculate scores for all ads in a separate step
             # This prevents rollbacks during page rendering
             if st.session_state.search_results:
+                # Use the configuration values from config.yaml
                 st.session_state.search_results = db.calculate_scores_for_ads(
-                    st.session_state.search_results,
-                    max_scored_items=2000,  # Calculate scores for all ads
-                    score_threshold=0.0     # Only stop scoring if score is 0 or negative
+                    st.session_state.search_results
+                    # No need to specify max_scored_items and score_threshold
+                    # as they will use the values from config.yaml
                 )
 
             st.session_state.is_loading = False

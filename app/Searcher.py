@@ -12,7 +12,11 @@ class Searcher(BaseDatabaseConnector):
     def __init__(self):
         super().__init__()
         self.db_config = self.config.get_database_config()
-        self.scorer = Scorer()
+        self.limits_config = self.config.get_limits_config()
+        self.scoring_enabled = self.limits_config.get('scoring_enabled', True)
+        self.max_scored_items = self.limits_config.get('max_scored_items', 2000)
+        self.score_threshold = self.limits_config.get('score_threshold', 0.0)
+        self.scorer = Scorer() if self.scoring_enabled else None
 
     """
     Search for ads in the database with optional filters
@@ -22,7 +26,7 @@ class Searcher(BaseDatabaseConnector):
     Returns:
         list: List of Ad objects containing the matching records
     """
-    def search_ads(self, filters=None, max_scored_items=2000, score_threshold=0.0, calculate_scores=True):
+    def search_ads(self, filters=None, max_scored_items=None, score_threshold=None, calculate_scores=None):
         """
         Search for ads in the database with optional filters.
 
@@ -31,11 +35,23 @@ class Searcher(BaseDatabaseConnector):
                           e.g. {'district': 'Centrs', 'nr_of_rooms': 2}
             max_scored_items (int): Maximum number of items to calculate scores for
                                   (to limit processing time for large result sets)
-            score_threshold (float): Threshold value below which we should stop scoring (default: 0.0)
-            calculate_scores (bool): Whether to calculate scores for the ads (default: True)
+                                  If None, uses the value from config
+            score_threshold (float): Threshold value below which we should stop scoring
+                                   If None, uses the value from config
+            calculate_scores (bool): Whether to calculate scores for the ads
+                                   If None, uses the value from config (scoring_enabled)
         Returns:
             list: List of Ad objects containing the matching records
         """
+        # Use config values if parameters are not provided
+        if max_scored_items is None:
+            max_scored_items = self.max_scored_items
+
+        if score_threshold is None:
+            score_threshold = self.score_threshold
+
+        if calculate_scores is None:
+            calculate_scores = self.scoring_enabled
         try:
             if not self.connection and not self.connect():
                 return []
@@ -134,18 +150,30 @@ class Searcher(BaseDatabaseConnector):
             self.error(f"Error while getting unique series: {error}")
             return []
 
-    def calculate_scores_for_ads(self, ads, max_scored_items=2000, score_threshold=0.0):
+    def calculate_scores_for_ads(self, ads, max_scored_items=None, score_threshold=None):
         """
         Calculate scores for a list of ads.
 
         Args:
             ads (list): List of Ad objects to calculate scores for
             max_scored_items (int): Maximum number of items to calculate scores for
+                                  If None, uses the value from config
             score_threshold (float): Threshold value below which we should stop scoring
+                                   If None, uses the value from config
 
         Returns:
             list: The same list of Ad objects with scores calculated
         """
+        # Use config values if parameters are not provided
+        if max_scored_items is None:
+            max_scored_items = self.max_scored_items
+
+        if score_threshold is None:
+            score_threshold = self.score_threshold
+
+        # If scoring is disabled in config, return ads without scoring
+        if not self.scoring_enabled:
+            return ads
         try:
             if not self.scorer or not ads:
                 return ads
@@ -186,10 +214,6 @@ class Searcher(BaseDatabaseConnector):
         except Exception as error:
             self.error(f"Error while calculating scores for ads: {error}")
             return ads
-
-
-# For backward compatibility, create an alias
-DatabaseConnector = Searcher
 
 if __name__ == "__main__":
     # Test database connection

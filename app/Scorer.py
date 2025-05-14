@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from BaseDatabaseConnector import BaseDatabaseConnector
 from Ad import Ad
+from Utils import simplify_address
 
 class Scorer(BaseDatabaseConnector):
     """
@@ -13,20 +14,28 @@ class Scorer(BaseDatabaseConnector):
     def __init__(self):
         super().__init__()
         self.db_config = self.config.get_osgi_scorer_database_config()
+        self.limits_config = self.config.get_limits_config()
+        self.scoring_enabled = self.limits_config.get('scoring_enabled', True)
+        self.score_threshold = self.limits_config.get('score_threshold', 0.0)
 
         # Get the URL for the geocoding service
         self.url = self.db_config.get('url', 'http://localhost:8080/search?q=')
 
     def get_lat_lon(self, street: str) -> tuple[float, float]:
-        city = "R%C4%ABga"
-        street = street.replace(" ", "+")
+        city = "Riga"
 
-        url = self.url + street + f",+{city}&format=json"
+        # Expand street abbreviations to their full forms
+        expanded_street = simplify_address(street)
+
+        # Replace spaces with plus signs for URL encoding
+        street_url = expanded_street.replace(" ", "+")
+
+        url = self.url + street_url + f",+{city}&format=json"
 
         try:
             r = requests.get(url).json()[0]
         except IndexError:
-            print(f"An invalid or non-existing street name: {street}")
+            print(f"An invalid or non-existing street name: {street}->{street_url}")
             return (0, 0)
 
         latitude = r["lat"]
@@ -62,37 +71,56 @@ class Scorer(BaseDatabaseConnector):
             self.error(f"Error while getting location score: {e}")
             return -1
 
-    def get_score_for_ad(self, ad: Ad, threshold: float = 0.0) -> float:
+    def get_score_for_ad(self, ad: Ad, threshold: float = None) -> float:
         """
         Get a score for an ad based on its coordinates.
 
         Args:
             ad (Ad): Ad object
-            threshold (float): Threshold value below which we should stop scoring (default: 0.0)
+            threshold (float): Threshold value below which we should stop scoring
+                              If None, uses the value from config
                               This parameter is not used in this method but is included for API consistency
 
         Returns:
             float: Score value or -1 if an error occurred
         """
+        # Use config value if parameter is not provided
+        if threshold is None:
+            threshold = self.score_threshold
+
+        # If scoring is disabled in config, return 0
+        if not self.scoring_enabled:
+            return 0
         try:
+            # Get coordinates for the address
             lat, lon = self.get_lat_lon(ad.street)
+
+            # Calculate score based on coordinates
             score = self.get_score(lat, lon)
             return score
         except Exception as e:
             self.error(f"Error while getting score for ad: {e}")
             return -1
 
-    def should_continue_scoring(self, score: float, threshold: float = 0.0) -> bool:
+    def should_continue_scoring(self, score: float, threshold: float = None) -> bool:
         """
         Determine if we should continue scoring more ads based on the current score.
 
         Args:
             score (float): The current ad's score
             threshold (float): Threshold value below which we should stop scoring
+                              If None, uses the value from config
 
         Returns:
             bool: True if we should continue scoring, False otherwise
         """
+        # Use config value if parameter is not provided
+        if threshold is None:
+            threshold = self.score_threshold
+
+        # If scoring is disabled in config, return False to stop scoring
+        if not self.scoring_enabled:
+            return False
         # If score is -1, it means there was an error, so we should continue
         if score == -1:
             return True
@@ -100,11 +128,10 @@ class Scorer(BaseDatabaseConnector):
         # If score is below threshold, we should stop scoring
         return score >= threshold
 
-
 if __name__ == "__main__":
     scorer = Scorer()
     print("coordinates:")
-    print(scorer.get_lat_lon("Bruņinieku iela 45"))
+    print(scorer.get_lat_lon("J. Vācieša 6"))
     print("score:")
     print(scorer.get_score(56.9519, 24.1171))
 
@@ -113,7 +140,7 @@ if __name__ == "__main__":
         id=1,
         site_id=1,
         district="Centrs",
-        street="Bruņinieku iela 45",
+        street="Čiekurkalna 4. šķ l. 12 k-2",
         nr_of_rooms=2,
         area_m2=50,
         floor=2,
