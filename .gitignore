@@ -6,3 +6,4 @@ deadlines.md
 .do/
 app.log
 __pycache__/
+**/.ignore

@@ -13,6 +13,8 @@ st.markdown(base_page_style_extended(), unsafe_allow_html=True)
 # Initialize session state for pagination if not exists
 if 'page_number' not in st.session_state:
     st.session_state.page_number = 1
+if 'search_text' not in st.session_state:
+    st.session_state.search_text = ""
 if 'search_results' not in st.session_state:
     st.session_state.search_results = None
 if 'selected_ad' not in st.session_state:
@@ -21,6 +23,22 @@ if 'is_loading' not in st.session_state:
     st.session_state.is_loading = False
 
 RESULTS_PER_PAGE = 6
+
+# Initialize session state for query parameters
+if 'query_params_processed' not in st.session_state:
+    st.session_state.query_params_processed = False
+
+# Function to process URL query parameters
+def get_query_params():
+    if not st.session_state.query_params_processed:
+        query_params = st.query_params
+        if 'q' in query_params and query_params['q']:
+            search_query = query_params['q']
+            st.session_state.search_text = search_query
+            
+            return search_query
+            
+    return ""
 
 def show_search_page():
     # Add widgets to sidebar
@@ -41,6 +59,7 @@ from DetailsPage import show_details_page2
 # Main app logic
 with st.spinner('Loading... Please be patient.'):
     if st.session_state.selected_ad is None:
+        get_query_params()
         show_search_page()
     else:
         show_details_page2(st)

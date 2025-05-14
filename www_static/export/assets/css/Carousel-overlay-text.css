@@ -1,0 +1,42 @@
+.slider-container {
+  position: relative;
+  max-height: 500px;
+  min-height: 500px;
+}
+
+.text-overlay {
+  position: absolute;
+  bottom: 68px;
+  background: rgba(31,6,6,0.8);
+  width: 100%;
+  color: rgba(255,255,255,0.8);
+  padding: 20px;
+}
+
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.carousel-indicators .active {
+  opacity: 1;
+  width: 30px;
+  border-top-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 0;
+}
+

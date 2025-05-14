@@ -5,7 +5,7 @@ def create_search_form(st, db):
     with st.container():
         with st.sidebar.form("search_form"):
             # Search bar for general text search
-            search_text = st.text_input("Search", "")
+            search_text = st.text_input("Search", st.session_state.search_text)
 
             # District search
             district = st.text_input("District")
@@ -47,7 +47,8 @@ def create_search_form(st, db):
 
             submitted = st.form_submit_button("Search")
 
-            if submitted:
+            if submitted or (search_text and not st.session_state.query_params_processed):                
+                st.session_state.query_params_processed = True
                 search(st, db, search_text, district, building_type, series, min_rooms, max_rooms, min_price, max_price, min_area, max_area)
 
 def search(st, db, search_text=None, district=None, building_type=None, series=None, min_rooms=None, max_rooms=None, min_price=None, max_price=None, min_area=None, max_area=None):
